@@ -16,7 +16,7 @@ import plotly.express as px
 
 root_dir = Path(__file__).resolve().parents[0]
 data_dir = root_dir / 'data'
-print(f'\n{root_dir=}\n{data_dir=}\n')
+# print(f'\n{root_dir=}\n{data_dir=}\n')
 
 #%% Import data
 @st.cache_data #cache data in order not reload it everytime the page is being refreshed
@@ -62,17 +62,33 @@ def load_data(verbose=False):
 
 df_agg, df_agg_sub, df_comments, df_timeperf = load_data()
 
-df_agg_diff = df_agg.copy()
+metric_cols = ['Views', 'Likes', 'Subscribers', 'Shares', 'CommentsAdded', 'RPM_$', 'AverageViewed_%', 'AverageViewDuration']
+cols = ['VideoTitle', 'VideoPublishTime']
+cols.extend(metric_cols)
+
+df_agg_diff = df_agg[cols].copy()
 date_12mo = df_agg_diff['VideoPublishTime'].max() - pd.DateOffset(months=12)
-date_6mo  = df_agg_diff['VideoPublishTime'].max() - pd.DateOffset(months=6)
+date_3mo  = df_agg_diff['VideoPublishTime'].max() - pd.DateOffset(months=3)
 
-metric_columns = ['Views', 'Likes', 'Subscribers', 'Shares', 'CommentsAdded',
-                  'RPM_$', 'AverageViewed_%', 'AverageViewDuration']
 median_12mo = df_agg_diff[df_agg_diff['VideoPublishTime']>=date_12mo]
-median_12mo = median_12mo[metric_columns].median()
+median_3mo = df_agg_diff[df_agg_diff['VideoPublishTime']>=date_3mo]
 
+median_12mo = median_12mo[metric_cols].median()
+median_3mo = median_3mo[metric_cols].median()
+median_3mo = (median_3mo - median_12mo) / median_12mo
+for i, x in enumerate(median_3mo.values):
+    median_3mo.iloc[i] = f'{x*100:.2f}%'
+
+df_agg_diff.loc[:,metric_cols] = (df_agg_diff.loc[:,metric_cols] - median_12mo).div(median_12mo)
+df_agg_diff = df_agg_diff.sort_values(by='VideoPublishTime', ascending=False)
 #%% Build dashboard
 
 add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate Metrics','Individual Video Analysis'])
 
-
+if add_sidebar == 'Aggregate Metrics':
+    st.write('Aggregated metrics')
+    for col in metric_cols:
+        st.metric(col, median_12mo[col], delta=median_3mo[col])
+    st.dataframe(df_agg_diff)
+if add_sidebar == 'Individual Video Analysis':
+    st.write('Individual Video Analysis')
