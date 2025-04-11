@@ -87,8 +87,12 @@ add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate 
 
 if add_sidebar == 'Aggregate Metrics':
     st.write('Aggregated metrics')
-    for col in metric_cols:
-        st.metric(col, median_12mo[col], delta=median_3mo[col])
+    st_cols = st.columns(5)
+    
+    for i, col in enumerate(metric_cols):
+        with st_cols[i]:
+            st.metric(col, median_12mo[col], delta=median_3mo[col])
+        
     st.dataframe(df_agg_diff)
 if add_sidebar == 'Individual Video Analysis':
     st.write('Individual Video Analysis')
