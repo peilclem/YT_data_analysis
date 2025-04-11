@@ -60,11 +60,19 @@ def load_data(verbose=False):
 
 #%% 
 
+df_agg, df_agg_sub, df_comments, df_timeperf = load_data()
+
+df_agg_diff = df_agg.copy()
+date_12mo = df_agg_diff['VideoPublishTime'].max() - pd.DateOffset(months=12)
+date_6mo  = df_agg_diff['VideoPublishTime'].max() - pd.DateOffset(months=6)
+
+metric_columns = ['Views', 'Likes', 'Subscribers', 'Shares', 'CommentsAdded',
+                  'RPM_$', 'AverageViewed_%', 'AverageViewDuration']
+median_12mo = df_agg_diff[df_agg_diff['VideoPublishTime']>=date_12mo]
+median_12mo = median_12mo[metric_columns].median()
 
 #%% Build dashboard
 
 add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate Metrics','Individual Video Analysis'])
 
 
-
-df_agg, df_agg_sub, df_comments, df_timeperf = load_data()
