@@ -86,13 +86,19 @@ df_agg_diff = df_agg_diff.sort_values(by='VideoPublishTime', ascending=False)
 add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate Metrics','Individual Video Analysis'])
 
 if add_sidebar == 'Aggregate Metrics':
-    st.write('Aggregated metrics')
-    st_cols = st.columns(5)
+    st.header('Overall metrics')
+    
+    st_cols1 = st.columns(5)
+    st_cols2 = st.columns(5)
     
     for i, col in enumerate(metric_cols):
-        with st_cols[i]:
-            st.metric(col, median_12mo[col], delta=median_3mo[col])
-        
+        if i < 5:
+            with st_cols1[i]:
+                st.metric(col, median_12mo[col], delta=median_3mo[col])
+        else:
+            with st_cols2[i-5]:
+                st.metric(col, median_12mo[col], delta=median_3mo[col])
+            
     st.dataframe(df_agg_diff)
 if add_sidebar == 'Individual Video Analysis':
     st.write('Individual Video Analysis')
