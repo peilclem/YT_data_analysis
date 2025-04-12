@@ -57,7 +57,17 @@ def load_data(verbose=False):
     
     return df_agg, df_agg_sub, df_comments, df_timeperf
 
-
+def style_df(x, props:list):
+    try:
+        return props[0] if x>0 else props[1]
+    except:
+        pass
+    
+def style_percentage(x):
+    try:
+        return f'{x:.2%}' if isinstance(x, float) else x
+    except:
+        pass
 #%% 
 
 df_agg, df_agg_sub, df_comments, df_timeperf = load_data()
@@ -98,7 +108,16 @@ if add_sidebar == 'Aggregate Metrics':
         else:
             with st_cols2[i-5]:
                 st.metric(col, median_12mo[col], delta=median_3mo[col])
-            
-    st.dataframe(df_agg_diff)
+    
+    df_agg_diff['VideoPublishTime'] = df_agg_diff['VideoPublishTime'].apply(lambda x: x.date())
+    
+    st.dataframe(df_agg_diff.style.applymap(style_df, props=['color:green','color:red']).format(style_percentage))
+    
+    
+    
+    
+    
+    
+    
 if add_sidebar == 'Individual Video Analysis':
     st.write('Individual Video Analysis')
