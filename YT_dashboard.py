@@ -98,15 +98,16 @@ add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate 
 if add_sidebar == 'Aggregate Metrics':
     st.header('Overall metrics')
     
-    st_cols1 = st.columns(5)
-    st_cols2 = st.columns(5)
+    n_cols = 4
+    st_cols1 = st.columns(n_cols)
+    st_cols2 = st.columns(n_cols)
     
     for i, col in enumerate(metric_cols):
-        if i < 5:
+        if i < n_cols:
             with st_cols1[i]:
                 st.metric(col, median_12mo[col], delta=median_3mo[col])
         else:
-            with st_cols2[i-5]:
+            with st_cols2[i-n_cols]:
                 st.metric(col, median_12mo[col], delta=median_3mo[col])
     
     df_agg_diff['VideoPublishTime'] = df_agg_diff['VideoPublishTime'].apply(lambda x: x.date())
