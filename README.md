@@ -1,7 +1,7 @@
 # 📊 Ken Jee YouTube Data Analysis App
 
 This project features an interactive Streamlit web app built to explore and analyze Ken Jee's YouTube channel data. The dataset is sourced from [Kaggle](https://www.kaggle.com/datasets/kenjee/ken-jee-youtube-data/data) and provides valuable insights into video performance, trends, and audience engagement.
-The app can be found at the following link [PeilClem Streamlit App] (https://www.kaggle.com/datasets/kenjee/ken-jee-youtube-data/data]
+The app can be found at the following link [PeilClem Streamlit App] (https://www.kaggle.com/datasets/kenjee/ken-jee-youtube-data/data)
 
 ## 🔍 Overview
 
