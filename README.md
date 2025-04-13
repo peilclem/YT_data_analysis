@@ -20,6 +20,8 @@ The goal of this project is to provide a user-friendly interface for exploring k
 ### Prerequisites
 
 - Python 3.9+
+- Plotly
+- Streamlit
   
 ## 📥 Clone the Repository
 
