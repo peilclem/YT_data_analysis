@@ -165,8 +165,8 @@ if add_sidebar == 'Individual Video Analysis':
     fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['median_views'], mode='lines', name='50%', line=dict(color='royalblue', dash='dash')))
     fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['20pct_views'], mode='lines', name='20%', line=dict(color='purple', dash='dot')))
     fig2.add_trace(go.Scatter(x=first30['days_published'], y=first30['Views'].cumsum(), mode='lines', name='Current Video', line=dict(color='firebrick', width=3)))
-
-
+    fig2.update_layout(xaxis_title='Days', yaxis_title='Views')
+    
     st.plotly_chart(fig2)
     
     
