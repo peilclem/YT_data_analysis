@@ -68,6 +68,14 @@ def style_percentage(x):
         return f'{x:.2%}' if isinstance(x, float) else x
     except:
         pass
+    
+def audience(country):
+    if country == 'US':
+        return 'USA'
+    elif country == 'ID':
+        return 'India'
+    else:
+        return 'Other'
 #%% 
 
 df_agg, df_agg_sub, df_comments, df_timeperf = load_data()
@@ -91,6 +99,21 @@ for i, x in enumerate(median_3mo.values):
 
 df_agg_diff.loc[:,metric_cols] = (df_agg_diff.loc[:,metric_cols] - median_12mo).div(median_12mo)
 df_agg_diff = df_agg_diff.sort_values(by='VideoPublishTime', ascending=False)
+
+df_time_diff = pd.merge(df_timeperf, df_agg.loc[:,['VideoID','VideoPublishTime']], left_on='External Video ID', right_on='VideoID')
+df_time_diff['days_published'] = (df_time_diff['Date'] - df_time_diff['VideoPublishTime']).dt.days
+
+date_12mo = df_agg['VideoPublishTime'].max() - pd.DateOffset(months=12)
+df_time_diff_yr = df_time_diff[df_time_diff['VideoPublishTime']>=date_12mo]
+
+views_days = pd.pivot_table(df_time_diff_yr, index='days_published', values='Views', aggfunc=[np.mean, np.median, lambda x: np.percentile(x, 80), lambda x: np.percentile(x, 20)]).reset_index()
+views_days.columns = ['days_published','mean_views','median_views','80pct_views','20pct_views']
+views_days = views_days[views_days['days_published'].between(0,30)]
+views_cumulative = views_days.loc[:,['days_published','median_views','80pct_views','20pct_views']]
+views_cumulative.loc[:,['median_views','80pct_views','20pct_views']] = views_cumulative.loc[:,['median_views','80pct_views','20pct_views']].cumsum()
+
+
+
 #%% Build dashboard
 
 add_sidebar = st.sidebar.selectbox('Aggregate or Individual video', ['Aggregate Metrics','Individual Video Analysis'])
@@ -112,13 +135,38 @@ if add_sidebar == 'Aggregate Metrics':
     
     df_agg_diff['VideoPublishTime'] = df_agg_diff['VideoPublishTime'].apply(lambda x: x.date())
     
-    st.dataframe(df_agg_diff.style.applymap(style_df, props=['color:green','color:red']).format(style_percentage))
-    
-    
-    
-    
+    st.dataframe(df_agg_diff.style.applymap(style_df, props=['color:lime','color:red']).format(style_percentage))
     
     
     
 if add_sidebar == 'Individual Video Analysis':
-    st.write('Individual Video Analysis')
+    st.header('Individual Video Analysis')
+    
+    # Fisrt chart
+    videos = tuple(df_agg['VideoTitle'])
+    video_select = st.selectbox('Pick a video to analyze:', videos)
+
+    agg_filtered = df_agg[df_agg['VideoTitle']==video_select]
+    agg_sub_filtered = df_agg_sub[df_agg_sub['VideoTitle']==video_select]
+    agg_sub_filtered['Country'] = agg_sub_filtered['CountryCode'].apply(audience)
+    agg_sub_filtered.sort_values('IsSub', inplace=True)
+    
+    fig1 = px.bar(agg_sub_filtered, x='Views', y='IsSub', color='Country', orientation='h')
+    st.plotly_chart(fig1)
+    
+    # Second chart
+    agg_time_filtered = df_time_diff[df_time_diff['Video Title']==video_select]
+    first30 = agg_time_filtered[agg_time_filtered['days_published'].between(0,30)]
+    first30 = first30.sort_values('days_published')
+
+    fig2 = go.Figure() 
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['80pct_views'], mode='lines', name='80%', line=dict(color='purple', dash='dot')))
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['median_views'], mode='lines', name='50%', line=dict(color='royalblue', dash='dash')))
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['20pct_views'], mode='lines', name='20%', line=dict(color='purple', dash='dot')))
+    fig2.add_trace(go.Scatter(x=first30['days_published'], y=first30['Views'].cumsum(), mode='lines', name='Current Video', line=dict(color='firebrick', width=3)))
+
+
+    st.plotly_chart(fig2)
+    
+    
+    
