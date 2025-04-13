@@ -42,13 +42,6 @@ The dataset includes:
 - Views, likes, comments
 - Video duration and tags
 
-## 🛠️ Tech Stack
-
-Python
-Streamlit
-Pandas
-Plotly
-
 ## 📄 License
 
 This project is open source and available under the MIT License.
