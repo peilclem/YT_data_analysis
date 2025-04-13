@@ -159,6 +159,7 @@ if add_sidebar == 'Individual Video Analysis':
     first30 = agg_time_filtered[agg_time_filtered['days_published'].between(0,30)]
     first30 = first30.sort_values('days_published')
 
+    st.subheader('30 days launch comparison')
     fig2 = go.Figure() 
     fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['80pct_views'], mode='lines', name='80%', line=dict(color='purple', dash='dot')))
     fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['median_views'], mode='lines', name='50%', line=dict(color='royalblue', dash='dash')))
