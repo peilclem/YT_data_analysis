@@ -28,7 +28,8 @@ Clone the project locally using:
 ```bash
 git clone https://github.com/peilclem/YT_data_analysis.git
 cd YT_data_analysis
-pip install -r requirements.txt'''
+pip install -r requirements.txt
+```bash
 
 ## 📁 Dataset
 
